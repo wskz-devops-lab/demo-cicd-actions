@@ -2,6 +2,9 @@
 
 Poniższy zestaw to gotowy scenariusz na 30–45 minut zajęć lub warsztatów koła naukowego oraz **instrukcja krok po kroku, jak uruchomić to samodzielnie na własnym koncie GitHub**.
 
+> **Jak przygotować konkretny system (GitHub / Forgejo / Cloudflare)?**  
+> Zobacz osobną instrukcję krok po kroku dla każdej platformy: [`KONFIGURACJA_PLATFORM.md`](./KONFIGURACJA_PLATFORM.md).
+
 ---
 
 ## Część 0: Jak to zrobić po swojej stronie na GitHubie (dla studenta)

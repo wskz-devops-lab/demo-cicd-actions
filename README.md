@@ -2,7 +2,7 @@
 
 **Koło Naukowe DevOps & Virtualization Lab (WSKZ)**  
 Praktyczne repozytorium referencyjne do **Projektu 3 (Automatyzacja CI/CD)**.  
-- **Dla studentów (ścieżka główna):** zaczynacie od **GitHub Actions** ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)) i instrukcji krok po kroku w [`SCENARIUSZE_DLA_STUDENTOW.md`](./SCENARIUSZE_DLA_STUDENTOW.md).
+- **Dla studentów (ścieżka główna):** zaczynacie od **GitHub Actions** ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)), instrukcji krok po kroku w [`SCENARIUSZE_DLA_STUDENTOW.md`](./SCENARIUSZE_DLA_STUDENTOW.md) oraz osobnych instrukcji pod każdą platformę w [`KONFIGURACJA_PLATFORM.md`](./KONFIGURACJA_PLATFORM.md).
 - **Własny serwer koła (Forgejo):** opis przypadku i konfiguracja self-hosted runnera ([`.forgejo/workflows/ci.yml`](./.forgejo/workflows/ci.yml)).
 - **Dodatek chmurowy (opcjonalny):** automatyczne wdrażanie na **Cloudflare Workers** ([`CLOUDFLARE_WORKERS_PORADNIK.md`](./CLOUDFLARE_WORKERS_PORADNIK.md)).
 
