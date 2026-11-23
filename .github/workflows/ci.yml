@@ -1,0 +1,50 @@
+# ==============================================================================
+# WORKFLOW GITHUB ACTIONS — Wersja dla chmury GitHub (github.com)
+# ==============================================================================
+# GitHub szuka plików YAML w katalogu: .github/workflows/
+# Składnia jest w ~95% identyczna z Forgejo Actions, ale różni się runnerem
+# ('ubuntu-latest' w chmurze GitHuba zamiast naszego 'linux-amd64' w Proxmoxie).
+# ==============================================================================
+
+name: Python CI Demo (GitHub Actions)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-and-report:
+    # W chmurze GitHuba nie musimy utrzymywać własnego serwera —
+    # wpisujemy 'ubuntu-latest', a GitHub na żądanie stawia świeżą maszynę wirtualną.
+    runs-on: ubuntu-latest
+
+    # 'strategy.matrix' pozwala przetestować ten sam kod na wielu wersjach Pythona
+    # jednocześnie (równolegle). Świetne do pokazania studentom mocy chmurowego CI!
+    strategy:
+      fail-fast: false # Jeśli jedna wersja padnie, dokończ sprawdzanie pozostałych
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: 📥 Pobranie kodu (Checkout)
+        uses: actions/checkout@v4
+
+      # Na GitHubie zamiast ręcznego 'apt-get' używamy oficjalnej akcji 'setup-python',
+      # która błyskawicznie udostępnia wybraną wersję Pythona z cache'a.
+      - name: 🐍 Konfiguracja Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 📦 Instalacja pytest
+        run: python -m pip install --upgrade pip pytest
+
+      - name: 🧪 Uruchomienie testów jednostkowych (pytest)
+        run: pytest -v --color=yes
+
+      - name: 🚀 Raport gotowości misji (tylko dla Python 3.12)
+        if: matrix.python-version == '3.12'
+        run: python rocket_telemetry.py

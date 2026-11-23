@@ -1,0 +1,82 @@
+# ==============================================================================
+# WORKFLOW FORGEJO ACTIONS — Wersja dla własnego serwera (dev.zarnecki.org)
+# ==============================================================================
+# Ten plik uruchamia się automatycznie przez Forgejo Actions.
+# Forgejo szuka plików YAML w katalogu: .forgejo/workflows/
+# (Uwaga: Forgejo obsługuje też .github/workflows/, ale własny katalog
+#  pozwala trzymać inną konfigurację runnera niż na GitHubie!)
+# ==============================================================================
+
+# 'name' — czytelna nazwa pipeline'u wyświetlana w zakładce "Actions" w Forgejo.
+name: Python CI Demo (Forgejo Self-Hosted)
+
+# 'on' — WYZWALACZE (Triggery), czyli zdarzenia, które uruchamiają ten plik.
+on:
+  # 1. Uruchom przy każdym wypchnięciu (git push) na gałąź 'main' (lub inną).
+  push:
+    branches:
+      - main
+    # Opcjonalnie: ignoruj zmiany tylko w plikach dokumentacji, żeby nie marnować czasu:
+    # paths-ignore:
+    #   - '**.md'
+
+  # 2. Uruchom przy każdym Pull Request (prośba o scalenie zmian do main).
+  #    Dzięki temu zepsuty kod zostanie zatrzymany PRZED scaleniem!
+  pull_request:
+    branches:
+      - main
+
+  # 3. Pozwala uruchomić pipeline ręcznie przyciskiem "Run workflow" w UI Forgejo.
+  workflow_dispatch:
+
+# 'jobs' — lista zadań (prac), które mogą wykonywać się równolegle lub po kolei.
+jobs:
+  # Identyfikator zadania (dowolna nazwa techniczna, bez spacji).
+  test-and-report:
+    # 'runs-on' — ETYKIETA RUNNERA.
+    # Na naszym serwerze Proxmox (kontener CT 100 'forgejo-runner') zarejestrowaliśmy
+    # runnera z etykietą 'linux-amd64' (zmapowaną na obraz kontenera node:22-bookworm
+    # uruchamiany przez Podmana).
+    # Na GitHubie zamiast tego wpisuje się 'ubuntu-latest'.
+    runs-on: linux-amd64
+
+    # 'steps' — sekwencyjna lista kroków wykonywanych wewnątrz jednego kontenera.
+    # Jeśli którykolwiek krok zwróci kod błędu != 0, kolejne kroki domyślnie NIE ruszą.
+    steps:
+      # KROK 1: Pobranie kodu z repozytorium do katalogu roboczego runnera.
+      # 'uses' wywołuje gotową, wielokrotnego użytku akcję (tutaj: actions/checkout@v4).
+      - name: 📥 Pobranie kodu (Checkout)
+        uses: actions/checkout@v4
+
+      # KROK 2: Przygotowanie środowiska Python + pytest.
+      # 'run' wykonuje zwykłe polecenia powłoki bash wewnątrz kontenera Podman.
+      # Ponieważ nasz runner używa lekkiego obrazu bazowego (node:22-bookworm),
+      # sprawdzamy, czy python3 i pytest są już obecne; jeśli nie — doinstalowujemy je.
+      - name: 🐍 Sprawdzenie i instalacja Python + pytest
+        run: |
+          if ! command -v python3 >/dev/null 2>&1 || ! python3 -m pytest --version >/dev/null 2>&1; then
+            apt-get update -qq
+            DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3 python3-pytest >/dev/null
+          fi
+          python3 --version
+          python3 -m pytest --version
+
+      # KROK 3: Uruchomienie testów jednostkowych.
+      # -v        : tryb szczegółowy (wypisuje nazwę każdego testu osobno)
+      # --color=yes: wymusza kolory ANSI w logach Forgejo Actions
+      # Jeśli chociaż 1 test nie przejdzie, pytest zwróci kod 1 -> cały job stanie się CZERWONY!
+      - name: 🧪 Uruchomienie testów jednostkowych (pytest)
+        run: python3 -m pytest -v --color=yes
+
+      # KROK 4: Skrypt demonstracyjny — uruchamia się TYLKO wtedy, gdy testy przeszły!
+      - name: 🚀 Raport gotowości misji
+        run: python3 rocket_telemetry.py
+
+      # KROK 5 (BONUS): Reakcja na błąd — warunek 'if: failure()' sprawia,
+      # że ten krok wykona się WYŁĄCZNIE wtedy, gdy poprzedni krok zawiódł.
+      # Idealne miejsce na wysłanie alertu na Mattermost / Zulip / Discord / e-mail.
+      - name: 🚨 Alert w razie awarii (demo)
+        if: failure()
+        run: |
+          echo "::error::Testy nie przeszły! Wdrożenie zostało zablokowane."
+          echo "Sprawdź logi kroku pytest powyżej lub uruchom lokalnie: pytest -v"

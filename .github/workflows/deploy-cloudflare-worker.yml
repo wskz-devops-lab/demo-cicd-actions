@@ -1,0 +1,53 @@
+# ==============================================================================
+# DEPLOY DO CLOUDFLARE WORKERS — GitHub Actions
+# ==============================================================================
+# Ten workflow automatycznie publikuje kod z katalogu 'cloudflare-worker-demo/'
+# na serwery brzegowe Cloudflare (Edge) po każdym pushu do gałęzi 'main'.
+#
+# WYMAGANE SEKRETY w GitHub (Settings -> Secrets and variables -> Actions):
+#   1. CLOUDFLARE_API_TOKEN  - Token z uprawnieniem "Edit Cloudflare Workers"
+#   2. CLOUDFLARE_ACCOUNT_ID - ID Twojego konta Cloudflare (z panelu dash.cloudflare.com)
+# ==============================================================================
+
+name: Deploy Cloudflare Worker (GitHub)
+
+on:
+  push:
+    branches: [ main ]
+    # Uruchamiaj TEN workflow tylko wtedy, gdy zmieni się kod Workera lub sam plik workflow.
+    # Dzięki temu zmiany w kodzie Pythona nie będą niepotrzebnie wdrażać Workera!
+    paths:
+      - 'cloudflare-worker-demo/**'
+      - '.github/workflows/deploy-cloudflare-worker.yml'
+
+  # Pozwala też na ręczne uruchomienie wdrożenia z zakładki Actions w GitHubie.
+  workflow_dispatch:
+
+jobs:
+  deploy-worker:
+    runs-on: ubuntu-latest
+    # Domyślny katalog roboczy dla wszystkich kroków 'run' w tym zadaniu
+    defaults:
+      run:
+        working-directory: cloudflare-worker-demo
+
+    steps:
+      - name: 📥 Pobranie kodu
+        uses: actions/checkout@v4
+
+      - name: 📦 Konfiguracja Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 🔧 Instalacja zależności (wrangler)
+        run: npm install
+
+      # Oficjalna akcja Cloudflare, która wywołuje 'wrangler deploy'
+      # i przekazuje sekrety uwierzytelniające.
+      - name: ☁️ Publikacja na Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloudflare-worker-demo
