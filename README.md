@@ -1,7 +1,10 @@
-# Demo CI/CD: Forgejo Actions, GitHub Actions i Cloudflare Workers
+# Demo CI/CD: GitHub Actions (nr 1 dla studentów), Forgejo Actions i Cloudflare Workers
 
 **Koło Naukowe DevOps & Virtualization Lab (WSKZ)**  
-Praktyczne repozytorium referencyjne do **Projektu 3 (Automatyzacja CI/CD)**. Pokazuje na żywym, lekkim przykładzie, jak działa nowoczesny pipeline CI/CD — zarówno na **własnym serwerze (Forgejo + Runner na Proxmox VE)**, jak i w chmurze (**GitHub Actions** oraz **Cloudflare Workers**).
+Praktyczne repozytorium referencyjne do **Projektu 3 (Automatyzacja CI/CD)**.  
+- **Dla studentów (ścieżka główna):** zaczynacie od **GitHub Actions** ([`.github/workflows/ci.yml`](./.github/workflows/ci.yml)) i instrukcji krok po kroku w [`SCENARIUSZE_DLA_STUDENTOW.md`](./SCENARIUSZE_DLA_STUDENTOW.md).
+- **Własny serwer koła (Forgejo):** opis przypadku i konfiguracja self-hosted runnera ([`.forgejo/workflows/ci.yml`](./.forgejo/workflows/ci.yml)).
+- **Dodatek chmurowy (opcjonalny):** automatyczne wdrażanie na **Cloudflare Workers** ([`CLOUDFLARE_WORKERS_PORADNIK.md`](./CLOUDFLARE_WORKERS_PORADNIK.md)).
 
 ---
 
