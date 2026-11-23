@@ -1,6 +1,32 @@
-# Scenariusze pokazowe CI/CD dla studentów (Live Demo)
+# Scenariusze pokazowe CI/CD dla studentów (Live Demo + GitHub)
 
-Poniższy zestaw to gotowy scenariusz na 30–45 minut zajęć lub warsztatów koła naukowego. Pokazuje **dlaczego CI/CD istnieje** i co dokładnie dzieje się po stronie serwera oraz runnera.
+Poniższy zestaw to gotowy scenariusz na 30–45 minut zajęć lub warsztatów koła naukowego oraz **instrukcja krok po kroku, jak uruchomić to samodzielnie na własnym koncie GitHub**.
+
+---
+
+## Część 0: Jak to zrobić po swojej stronie na GitHubie (dla studenta)
+
+Jeśli realizujesz projekt na **własnym koncie GitHub** (`github.com`), wykonaj poniższe 5 kroków:
+
+1. **Utwórz własną kopię repozytorium:**
+   - Kliknij **Fork** w repozytorium koła (`wskz-devops-lab/demo-cicd-actions`) **albo** utwórz własne nowe repozytorium na GitHubie i wrzuć do niego pliki (pamiętając o katalogu `.github/workflows/ci.yml`).
+   - Sklonuj je lokalnie:
+     ```bash
+     git clone git@github.com:TWOJ_LOGIN/demo-cicd-actions.git
+     cd demo-cicd-actions
+     ```
+2. **Włącz GitHub Actions (ważne przy forku!):**
+   - Na GitHubie forki mają domyślnie wyłączone workflow ze względów bezpieczeństwa.
+   - Wejdź w zakładkę **Actions** w swoim repozytorium i kliknij zielony przycisk **I understand my workflows, go ahead and enable them**.
+3. **Dodaj sekrety (tylko jeśli wdrażasz Cloudflare Workers):**
+   - Wejdź w **Settings → Secrets and variables → Actions → New repository secret**.
+   - Dodaj `CLOUDFLARE_API_TOKEN` oraz `CLOUDFLARE_ACCOUNT_ID` (szczegóły w [`CLOUDFLARE_WORKERS_PORADNIK.md`](./CLOUDFLARE_WORKERS_PORADNIK.md)).
+4. **Włącz ochronę gałęzi `main` (Branch Protection — dobra praktyka zespołowa):**
+   - Wejdź w **Settings → Branches → Add branch protection rule** (lub *Rulesets*).
+   - Wpisz `main`, zaznacz **Require a pull request before merging** oraz **Require status checks to pass before merging** (wybierz `test-and-report`).
+   - Od teraz GitHub zablokuje przycisk *Merge*, jeśli testy w CI są czerwone!
+5. **Przetestuj w praktyce:**
+   - Wypchnij zmianę na gałąź (`git push`) i obserwuj zakładkę **Actions** — GitHub automatycznie uruchomi maszynę `ubuntu-latest` i przetestuje kod na Pythonie 3.11 oraz 3.12 równolegle.
 
 ---
 
